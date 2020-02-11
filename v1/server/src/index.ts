@@ -1,17 +1,22 @@
 import express from "express";
+import { listings } from "./listings";
 
 const app = express();
 const port = 8888;
 
-const greeting = "Howdy pilgrim!";
+app.get("/ip", (req, res) => {
+  const greeting = "Howdy pilgrim!";
 
-app.get("/", (req, res) => {
-  console.log(req.ip);
-  res.send(greeting);
+  let ip = req.ip;
+  ip = ip.replace("::ffff:", "");
+  ip = ip.replace("::1", "127.0.0.1");
+  console.log(ip);
+
+  res.send(`${greeting} Your IP is: ${ip}`);
 });
 
-app.get("/norm", (_req, res) => {
-  res.send("I like bananas. They're yellow.");
+app.get("/listings", (_req, res) => {
+  res.send(listings);
 });
 
 const a = 5,
