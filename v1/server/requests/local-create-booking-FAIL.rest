@@ -1,0 +1,7 @@
+post http://localhost:8888/create-booking
+Content-Type: application/json
+
+{
+    "id": "005",
+    "timestamp": "01/01/2020, 9:00:00 AM"
+}

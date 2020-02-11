@@ -1,8 +1,11 @@
 import express from "express";
-import { listings } from "./listings";
+import bodyParser from "body-parser";
+import { listings, totalBookings, Booking } from "./listings";
 
 const app = express();
 const port = 8888;
+
+app.use(bodyParser.json());
 
 app.get("/ip", (req, res) => {
   const greeting = "Howdy pilgrim!";
@@ -17,6 +20,74 @@ app.get("/ip", (req, res) => {
 
 app.get("/listings", (_req, res) => {
   res.send(listings);
+});
+
+app.post("/create-booking", (req, res) => {
+  console.log(req.body);
+  const id = req.body.id;
+  let index: number | undefined;
+
+  const chosenListing = listings.find((el, idx) => {
+    if (el.id === id) {
+      index = idx;
+      return true;
+    }
+  });
+
+  if (!chosenListing) {
+    res.send("Error! Wrong ID or listing is not available.");
+    return;
+  }
+
+  totalBookings.count++;
+
+  const newBooking: Booking = {
+    id: totalBookings.count.toString(),
+    title: chosenListing.title,
+    image: chosenListing.image,
+    address: chosenListing.address,
+    timestamp: req.body.timestamp
+  };
+
+  if (index !== undefined) {
+    listings[index].bookings.push(newBooking);
+    res.send("The booking was successfully added!");
+  } else {
+    console.log(
+      "Oops! Not supposed to reach this. Something went horribly wrong!"
+    );
+  }
+});
+
+// TODO: bookings should be sorted by ID AND real timestamps should be created
+app.get("/bookings", (_req, res) => {
+  const listingsWithBookings = listings.filter(
+    item => item.bookings.length > 0
+  );
+  const bookingsArrays = listingsWithBookings.map(item => item.bookings);
+  const result: Booking[] = [];
+  bookingsArrays.forEach(bookings => {
+    bookings.forEach(booking => {
+      result.push(booking);
+    });
+  });
+
+  if (result.length === 0) {
+    res.send("None of the listings were booked!");
+  } else {
+    res.send(result);
+  }
+});
+
+app.post("/del-listing", (req, res) => {
+  const id: string = req.body.id;
+  for (let i = 0; i < listings.length; i++) {
+    if (listings[i].id === id) {
+      return res.send(listings.splice(i, 1));
+    }
+  }
+
+  return res.send(`Failed to delete listing with id: ${id}`);
 });
 
 const a = 5,

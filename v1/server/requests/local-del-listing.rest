@@ -1,0 +1,6 @@
+post http://localhost:8888/del-listing
+Content-Type: application/json
+
+{
+    "id": "001"
+}
