@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { listings, totalBookings, Booking } from "./listings";
+import { getTimestamp } from "./helpers";
 
 const app = express();
 const port = 8888;
@@ -46,7 +47,7 @@ app.post("/create-booking", (req, res) => {
     title: chosenListing.title,
     image: chosenListing.image,
     address: chosenListing.address,
-    timestamp: req.body.timestamp
+    timestamp: getTimestamp()
   };
 
   if (index !== undefined) {
@@ -71,6 +72,8 @@ app.get("/bookings", (_req, res) => {
       result.push(booking);
     });
   });
+
+  console.log(getTimestamp());
 
   if (result.length === 0) {
     res.send("None of the listings were booked!");
