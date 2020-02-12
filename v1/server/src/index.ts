@@ -60,7 +60,6 @@ app.post("/create-booking", (req, res) => {
   }
 });
 
-// TODO: bookings should be sorted by ID AND real timestamps should be created
 app.get("/bookings", (_req, res) => {
   const listingsWithBookings = listings.filter(
     item => item.bookings.length > 0
@@ -78,7 +77,7 @@ app.get("/bookings", (_req, res) => {
   if (result.length === 0) {
     res.send("None of the listings were booked!");
   } else {
-    res.send(result);
+    res.send(result.sort((a, b) => parseInt(a.id) - parseInt(b.id)));
   }
 });
 
@@ -93,10 +92,9 @@ app.post("/del-listing", (req, res) => {
   return res.send(`Failed to delete listing with id: ${id}`);
 });
 
-const a = 5,
-  b = 7;
-
 app.get("/math", (_req, res) => {
+  const a = 5,
+    b = 7;
   res.send(`${a} + ${b} = ${a + b}`);
 });
 
