@@ -1,7 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { listings, doesListingExist } from "./listings";
-import { totalBookings, Booking } from "./bookings";
+import { listings, doesListingExist, deleteListing } from "./listings";
+import { totalBookings } from "./bookings";
+import { Booking } from "./models/booking";
+import { Listing } from "./models/listing";
 import { userFavorites } from "./favorites";
 import { getTimestamp } from "./helpers";
 
@@ -110,19 +112,12 @@ app.post(`/favorite-listing`, (req, res) => {
 
 app.post("/del-listing", (req, res) => {
   const id: string = req.body.id;
-  for (let i = 0; i < listings.length; i++) {
-    if (listings[i].id === id) {
-      return res.send(listings.splice(i, 1));
-    }
+  const result: Listing | undefined = deleteListing(id);
+  if (result) {
+    res.send(result);
+  } else {
+    res.send(`Failed to delete listing with id: ${id}`);
   }
-
-  return res.send(`Failed to delete listing with id: ${id}`);
-});
-
-app.get("/math", (_req, res) => {
-  const a = 5,
-    b = 7;
-  res.send(`${a} + ${b} = ${a + b}`);
 });
 
 app.listen(port);

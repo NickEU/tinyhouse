@@ -1,17 +1,4 @@
-import { Booking } from "./bookings";
-
-export interface Listing {
-  id: string;
-  title: string;
-  image: string;
-  address: string;
-  price: number;
-  numOfGuests: number;
-  numOfBeds: number;
-  numOfBaths: number;
-  rating: number;
-  bookings: Booking[];
-}
+import { Listing } from "./models/listing";
 
 export const listings: Listing[] = [
   {
@@ -57,4 +44,12 @@ export const listings: Listing[] = [
 
 export const doesListingExist = function(id: string): boolean {
   return listings.some(el => el.id === id) === true;
+};
+
+export const deleteListing = function(id: string): Listing | undefined {
+  for (let i = 0; i < listings.length; i++) {
+    if (listings[i].id === id) {
+      return listings.splice(i, 1)[0];
+    }
+  }
 };
