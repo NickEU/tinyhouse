@@ -93,29 +93,15 @@ app.get("/bookings", (_req, res) => {
 });
 
 app.post(`/favorite-listing`, (req, res) => {
-  const reqBodyId = req.body.id;
-  if (reqBodyId !== undefined && db.doesListingExist(reqBodyId)) {
-    const id = reqBodyId;
-    let index;
-    const result = userFavorites.find((el, idx) => {
-      if (el === id) {
-        index = idx;
-        return true;
-      }
-    });
-    if (result === undefined) {
-      userFavorites.push(id);
-      res.send(`Listing with ID ${id} added to favorites!`);
-    } else {
-      if (index !== undefined) {
-        userFavorites.splice(index, 1);
-        res.send(`Listing with ID ${id} removed from favorites!`);
-      }
-    }
-  } else {
-    res.send(`Error! No listing with ID ${reqBodyId} was found`);
+  const id = req.body.id;
+  const result = db.favoriteListing(id);
+  let responseMsg = `Error! No listing with ID ${id} was found`;
+  if (result.success) {
+    responseMsg = result.added
+      ? `Listing with ID ${id} added to favorites!`
+      : `Listing with ID ${id} removed from favorites!`;
   }
-  console.log(userFavorites);
+  res.send(responseMsg);
 });
 
 app.post("/del-listing", (req, res) => {
