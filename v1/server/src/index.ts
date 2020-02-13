@@ -7,7 +7,7 @@ import { Listing } from "./models/listing";
 import { getTimestamp } from "./helpers";
 
 const app = express();
-const port = 8888;
+const port = process.env.PORT || 3333;
 
 app.use(bodyParser.json());
 
@@ -24,11 +24,9 @@ app.get("/ip", (req, res) => {
 
 app.get("/listings", (_req, res) => {
   const result = db.getListings();
-  if (result.length) {
-    res.send(result);
-  } else {
-    res.send("Sorry, nothing is available right now!");
-  }
+  const responseMsg =
+    result.length === 0 ? "Sorry, nothing is available right now!" : result;
+  res.send(responseMsg);
 });
 
 app.get("/favorites", (_req, res) => {
