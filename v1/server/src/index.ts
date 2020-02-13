@@ -1,8 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import * as dbList from "./listings-methods";
-import { listings } from "./models/listings";
-import * as dbBook from "./bookings-methods";
+import { listings } from "./mock-db/listings";
+import db from "./mock-db/db-public";
 import { Booking } from "./models/booking";
 import { Listing } from "./models/listing";
 import { getTimestamp } from "./helpers";
@@ -24,7 +23,7 @@ app.get("/ip", (req, res) => {
 });
 
 app.get("/listings", (_req, res) => {
-  const result = dbList.getListings();
+  const result = db.getListings();
   if (result.length) {
     res.send(result);
   } else {
@@ -33,14 +32,14 @@ app.get("/listings", (_req, res) => {
 });
 
 app.get("/favorites", (_req, res) => {
-  const result = dbList.getFavorites();
+  const result = db.getFavorites();
   const responseMsg =
     result.length === 0 ? "You don't have any favorite listings yet!" : result;
   res.send(responseMsg);
 });
 
 app.get("/bookings", (_req, res) => {
-  const result = dbBook.getBookings();
+  const result = db.getBookings();
   const responseMsg =
     result.length === 0 ? "None of the listings were booked!" : result;
   res.send(responseMsg);
@@ -63,10 +62,10 @@ app.post("/create-booking", (req, res) => {
     return;
   }
 
-  dbBook.totalBookings.count++;
+  db.totalBookings.count++;
 
   const newBooking: Booking = {
-    id: dbBook.totalBookings.count.toString(),
+    id: db.totalBookings.count.toString(),
     title: chosenListing.title,
     image: chosenListing.image,
     address: chosenListing.address,
@@ -86,7 +85,7 @@ app.post("/create-booking", (req, res) => {
 
 app.post(`/favorite-listing`, (req, res) => {
   const id = req.body.id;
-  const result = dbList.favoriteListing(id);
+  const result = db.favoriteListing(id);
   let responseMsg = `Error! No listing with ID ${id} was found`;
   if (result.success) {
     responseMsg = result.added
@@ -98,7 +97,7 @@ app.post(`/favorite-listing`, (req, res) => {
 
 app.post("/del-listing", (req, res) => {
   const id: string = req.body.id;
-  const result: Listing | undefined = dbList.deleteListing(id);
+  const result: Listing | undefined = db.deleteListing(id);
   if (result) {
     res.send(result);
   } else {

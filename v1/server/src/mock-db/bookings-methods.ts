@@ -1,6 +1,6 @@
-import { Booking } from "./models/booking";
-import { listings } from "./models/listings";
-import { getTimestamp } from "./helpers";
+import { Booking } from "../models/booking";
+import { listings } from "./listings";
+import { getTimestamp } from "../helpers";
 
 export const getBookings = function(): Booking[] {
   const listingsWithBookings = listings.filter(

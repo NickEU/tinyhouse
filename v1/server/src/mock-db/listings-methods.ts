@@ -1,6 +1,6 @@
-import { listings } from "./models/listings";
-import { userFavorites } from "./models/favorites";
-import { Listing } from "./models/listing";
+import { listings } from "./listings";
+import { userFavorites } from "./favorites";
+import { Listing } from "../models/listing";
 
 export const doesListingExist = function(id: string): boolean {
   return listings.some(el => el.id === id) === true;
