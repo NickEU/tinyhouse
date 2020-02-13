@@ -1,11 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
-import * as db from "./listings-methods";
+import * as dbList from "./listings-methods";
 import { listings } from "./models/listings";
-import { totalBookings } from "./bookings-methods";
+import * as dbBook from "./bookings-methods";
 import { Booking } from "./models/booking";
 import { Listing } from "./models/listing";
-import { userFavorites } from "./models/favorites";
 import { getTimestamp } from "./helpers";
 
 const app = express();
@@ -25,7 +24,7 @@ app.get("/ip", (req, res) => {
 });
 
 app.get("/listings", (_req, res) => {
-  const result = db.getListings();
+  const result = dbList.getListings();
   if (result.length) {
     res.send(result);
   } else {
@@ -50,10 +49,10 @@ app.post("/create-booking", (req, res) => {
     return;
   }
 
-  totalBookings.count++;
+  dbBook.totalBookings.count++;
 
   const newBooking: Booking = {
-    id: totalBookings.count.toString(),
+    id: dbBook.totalBookings.count.toString(),
     title: chosenListing.title,
     image: chosenListing.image,
     address: chosenListing.address,
@@ -72,29 +71,15 @@ app.post("/create-booking", (req, res) => {
 });
 
 app.get("/bookings", (_req, res) => {
-  const listingsWithBookings = listings.filter(
-    item => item.bookings.length > 0
-  );
-  const bookingsArrays = listingsWithBookings.map(item => item.bookings);
-  const result: Booking[] = [];
-  bookingsArrays.forEach(bookings => {
-    bookings.forEach(booking => {
-      result.push(booking);
-    });
-  });
-
-  console.log(getTimestamp());
-
-  if (result.length === 0) {
-    res.send("None of the listings were booked!");
-  } else {
-    res.send(result.sort((a, b) => parseInt(a.id) - parseInt(b.id)));
-  }
+  const result = dbBook.getBookings();
+  const responseMsg =
+    result.length === 0 ? "None of the listings were booked!" : result;
+  res.send(responseMsg);
 });
 
 app.post(`/favorite-listing`, (req, res) => {
   const id = req.body.id;
-  const result = db.favoriteListing(id);
+  const result = dbList.favoriteListing(id);
   let responseMsg = `Error! No listing with ID ${id} was found`;
   if (result.success) {
     responseMsg = result.added
@@ -106,7 +91,7 @@ app.post(`/favorite-listing`, (req, res) => {
 
 app.post("/del-listing", (req, res) => {
   const id: string = req.body.id;
-  const result: Listing | undefined = db.deleteListing(id);
+  const result: Listing | undefined = dbList.deleteListing(id);
   if (result) {
     res.send(result);
   } else {
