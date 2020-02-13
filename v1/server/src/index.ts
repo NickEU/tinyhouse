@@ -1,6 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { listings, totalBookings, Booking } from "./listings";
+import { listings, doesListingExist } from "./listings";
+import { totalBookings, Booking } from "./bookings";
+import { userFavorites } from "./favorites";
 import { getTimestamp } from "./helpers";
 
 const app = express();
@@ -79,6 +81,31 @@ app.get("/bookings", (_req, res) => {
   } else {
     res.send(result.sort((a, b) => parseInt(a.id) - parseInt(b.id)));
   }
+});
+
+app.post(`/favorite-listing`, (req, res) => {
+  const reqBodyId = req.body.id;
+  if (reqBodyId !== undefined && doesListingExist(reqBodyId)) {
+    const id = reqBodyId;
+    let index;
+    const result = userFavorites.find((el, idx) => {
+      if (el === id) {
+        index = idx;
+        return true;
+      }
+    });
+    if (result === undefined) {
+      userFavorites.push(id);
+    } else {
+      if (index !== undefined) {
+        userFavorites.splice(index, 1);
+      }
+    }
+    res.send("Fav status changed!");
+  } else {
+    res.send(`Error! No listing with ID ${reqBodyId} was found`);
+  }
+  console.log(userFavorites);
 });
 
 app.post("/del-listing", (req, res) => {

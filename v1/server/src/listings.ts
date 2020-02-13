@@ -1,3 +1,5 @@
+import { Booking } from "./bookings";
+
 export interface Listing {
   id: string;
   title: string;
@@ -10,18 +12,6 @@ export interface Listing {
   rating: number;
   bookings: Booking[];
 }
-
-export interface Booking {
-  id: string;
-  title: string;
-  image: string;
-  address: string;
-  timestamp: string;
-}
-
-export const totalBookings = {
-  count: 0
-};
 
 export const listings: Listing[] = [
   {
@@ -64,3 +54,7 @@ export const listings: Listing[] = [
     bookings: []
   }
 ];
+
+export const doesListingExist = function(id: string): boolean {
+  return listings.some(el => el.id === id) === true;
+};
