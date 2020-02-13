@@ -42,6 +42,19 @@ export const favoriteListing = function(id: string): Record<string, boolean> {
   return obj;
 };
 
+export const getFavorites = function(): Listing[] {
+  const result: Listing[] = [];
+  const listingsCopy = JSON.parse(JSON.stringify(listings));
+  userFavorites.forEach(id => {
+    const listingEl = listingsCopy.find((el: Listing) => el.id === id);
+    if (listingEl) {
+      delete listingEl.bookings;
+      result.push(listingEl);
+    }
+  });
+  return result;
+};
+
 export const getListings = function(): Listing[] {
   const listingsCopy = JSON.parse(JSON.stringify(listings));
   const listingsWithoutBookings = listingsCopy.map((el: Listing) => {

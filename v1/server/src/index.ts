@@ -32,6 +32,20 @@ app.get("/listings", (_req, res) => {
   }
 });
 
+app.get("/favorites", (_req, res) => {
+  const result = dbList.getFavorites();
+  const responseMsg =
+    result.length === 0 ? "You don't have any favorite listings yet!" : result;
+  res.send(responseMsg);
+});
+
+app.get("/bookings", (_req, res) => {
+  const result = dbBook.getBookings();
+  const responseMsg =
+    result.length === 0 ? "None of the listings were booked!" : result;
+  res.send(responseMsg);
+});
+
 app.post("/create-booking", (req, res) => {
   console.log(req.body);
   const id = req.body.id;
@@ -68,13 +82,6 @@ app.post("/create-booking", (req, res) => {
       "Oops! Not supposed to reach this. Something went horribly wrong!"
     );
   }
-});
-
-app.get("/bookings", (_req, res) => {
-  const result = dbBook.getBookings();
-  const responseMsg =
-    result.length === 0 ? "None of the listings were booked!" : result;
-  res.send(responseMsg);
 });
 
 app.post(`/favorite-listing`, (req, res) => {
