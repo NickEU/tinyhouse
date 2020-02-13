@@ -1,10 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { listings, doesListingExist, deleteListing } from "./listings";
-import { totalBookings } from "./bookings";
+import * as db from "./listings-methods";
+import { listings } from "./models/listings";
+import { totalBookings } from "./bookings-methods";
 import { Booking } from "./models/booking";
 import { Listing } from "./models/listing";
-import { userFavorites } from "./favorites";
+import { userFavorites } from "./models/favorites";
 import { getTimestamp } from "./helpers";
 
 const app = express();
@@ -24,7 +25,12 @@ app.get("/ip", (req, res) => {
 });
 
 app.get("/listings", (_req, res) => {
-  res.send(listings);
+  const result = db.getListings();
+  if (result.length) {
+    res.send(result);
+  } else {
+    res.send("Sorry, nothing is available right now!");
+  }
 });
 
 app.post("/create-booking", (req, res) => {
@@ -55,6 +61,7 @@ app.post("/create-booking", (req, res) => {
   };
 
   if (index !== undefined) {
+    console.log(listings[index]);
     listings[index].bookings.push(newBooking);
     res.send("The booking was successfully added!");
   } else {
@@ -87,7 +94,7 @@ app.get("/bookings", (_req, res) => {
 
 app.post(`/favorite-listing`, (req, res) => {
   const reqBodyId = req.body.id;
-  if (reqBodyId !== undefined && doesListingExist(reqBodyId)) {
+  if (reqBodyId !== undefined && db.doesListingExist(reqBodyId)) {
     const id = reqBodyId;
     let index;
     const result = userFavorites.find((el, idx) => {
@@ -98,12 +105,13 @@ app.post(`/favorite-listing`, (req, res) => {
     });
     if (result === undefined) {
       userFavorites.push(id);
+      res.send(`Listing with ID ${id} added to favorites!`);
     } else {
       if (index !== undefined) {
         userFavorites.splice(index, 1);
+        res.send(`Listing with ID ${id} removed from favorites!`);
       }
     }
-    res.send("Fav status changed!");
   } else {
     res.send(`Error! No listing with ID ${reqBodyId} was found`);
   }
@@ -112,7 +120,7 @@ app.post(`/favorite-listing`, (req, res) => {
 
 app.post("/del-listing", (req, res) => {
   const id: string = req.body.id;
-  const result: Listing | undefined = deleteListing(id);
+  const result: Listing | undefined = db.deleteListing(id);
   if (result) {
     res.send(result);
   } else {
