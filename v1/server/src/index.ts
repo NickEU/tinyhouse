@@ -1,10 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { listings } from "./mock-db/listings";
 import db from "./mock-db/db-public";
-import { Booking } from "./models/booking";
 import { Listing } from "./models/listing";
-import { getTimestamp } from "./helpers";
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -46,38 +43,10 @@ app.get("/bookings", (_req, res) => {
 app.post("/create-booking", (req, res) => {
   console.log(req.body);
   const id = req.body.id;
-  let index: number | undefined;
-
-  const chosenListing = listings.find((el, idx) => {
-    if (el.id === id) {
-      index = idx;
-      return true;
-    }
-  });
-
-  if (!chosenListing) {
-    res.send("Error! Wrong ID or listing is not available.");
-    return;
-  }
-
-  db.totalBookings.count++;
-
-  const newBooking: Booking = {
-    id: db.totalBookings.count.toString(),
-    title: chosenListing.title,
-    image: chosenListing.image,
-    address: chosenListing.address,
-    timestamp: getTimestamp()
-  };
-
-  if (index !== undefined) {
-    console.log(listings[index]);
-    listings[index].bookings.push(newBooking);
+  if (db.createBooking(id)) {
     res.send("The booking was successfully added!");
   } else {
-    console.log(
-      "Oops! Not supposed to reach this. Something went horribly wrong!"
-    );
+    res.send("Error! Wrong ID or listing is not available.");
   }
 });
 
